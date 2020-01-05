@@ -1,4 +1,4 @@
-from models import *
+# from models import *
 import os
 import sys
 import time
@@ -7,7 +7,8 @@ import torch.nn.init as init
 from torchvision import datasets, transforms
 import numpy as np
 from torch.utils.data.dataset import *
-from torchvision.datasets.vision import *
+from torchvision.models import resnet18
+from torchvision.datasets import *
 from numpy import *
 from textCNN import *
 
@@ -23,96 +24,96 @@ class MLP(nn.Module):
         x = self.fc2(x)
         return x
 
-class DB_Pedia(VisionDataset):
-    @property
-    def train_labels(self):
-        warnings.warn("train_labels has been renamed targets")
-        return self.targets
+# class DB_Pedia(VisionDataset):
+#     @property
+#     def train_labels(self):
+#         warnings.warn("train_labels has been renamed targets")
+#         return self.targets
 
-    @property
-    def test_labels(self):
-        warnings.warn("test_labels has been renamed targets")
-        return self.targets
+#     @property
+#     def test_labels(self):
+#         warnings.warn("test_labels has been renamed targets")
+#         return self.targets
 
-    @property
-    def train_data(self):
-        warnings.warn("train_data has been renamed data")
-        return self.data
+#     @property
+#     def train_data(self):
+#         warnings.warn("train_data has been renamed data")
+#         return self.data
 
-    @property
-    def test_data(self):
-        warnings.warn("test_data has been renamed data")
-        return self.data
+#     @property
+#     def test_data(self):
+#         warnings.warn("test_data has been renamed data")
+#         return self.data
 
-    def __init__(self, root, train=True, transform=None):
-        super(DB_Pedia, self).__init__(root)
-        training_data_file = 'db_pedia_train_data.npy'
-        training_label_file = 'db_pedia_train_label.npy'
-        test_data_file = 'db_pedia_test_data.npy'
-        test_label_file = 'db_pedia_test_label.npy'
-        self.train = train  # training set or test set
+#     def __init__(self, root, train=True, transform=None):
+#         super(DB_Pedia, self).__init__(root)
+#         training_data_file = 'db_pedia_train_data.npy'
+#         training_label_file = 'db_pedia_train_label.npy'
+#         test_data_file = 'db_pedia_test_data.npy'
+#         test_label_file = 'db_pedia_test_label.npy'
+#         self.train = train  # training set or test set
 
-        if self.train:
-            self.data = np.load(training_data_file, allow_pickle=True)
-            self.targets = np.load(training_label_file, allow_pickle=True)
-        else:
-            self.data = np.load(test_data_file, allow_pickle=True)
-            self.targets = np.load(test_label_file, allow_pickle=True)
-        self.data = [x.reshape(50,50) for x in self.data]
-        self.targets =self.targets-1
-        self.targets = [x for x in self.targets]
+#         if self.train:
+#             self.data = np.load(training_data_file, allow_pickle=True)
+#             self.targets = np.load(training_label_file, allow_pickle=True)
+#         else:
+#             self.data = np.load(test_data_file, allow_pickle=True)
+#             self.targets = np.load(test_label_file, allow_pickle=True)
+#         self.data = [x.reshape(50,50) for x in self.data]
+#         self.targets =self.targets-1
+#         self.targets = [x for x in self.targets]
     
-    def __getitem__(self, index):
-        img, target = self.data[index], int(self.targets[index])
-        return img, target
+#     def __getitem__(self, index):
+#         img, target = self.data[index], int(self.targets[index])
+#         return img, target
 
-    def __len__(self):
-        return len(self.data)
+#     def __len__(self):
+#         return len(self.data)
 
-class TinyImageNet(VisionDataset):
-    @property
-    def train_labels(self):
-        warnings.warn("train_labels has been renamed targets")
-        return self.targets
+# class TinyImageNet(VisionDataset):
+#     @property
+#     def train_labels(self):
+#         warnings.warn("train_labels has been renamed targets")
+#         return self.targets
 
-    @property
-    def test_labels(self):
-        warnings.warn("test_labels has been renamed targets")
-        return self.targets
+#     @property
+#     def test_labels(self):
+#         warnings.warn("test_labels has been renamed targets")
+#         return self.targets
 
-    @property
-    def train_data(self):
-        warnings.warn("train_data has been renamed data")
-        return self.data
+#     @property
+#     def train_data(self):
+#         warnings.warn("train_data has been renamed data")
+#         return self.data
 
-    @property
-    def test_data(self):
-        warnings.warn("test_data has been renamed data")
-        return self.data
+#     @property
+#     def test_data(self):
+#         warnings.warn("test_data has been renamed data")
+#         return self.data
 
-    def __init__(self, root, train=True, transform=None):
-        super(TinyImageNet, self).__init__(root)
-        training_data_file = 'tiny_imagenet_train_x.npy'
-        training_label_file = 'tiny_imagenet_train_y.npy'
-        test_data_file = 'tiny_imagenet_train_x.npy'
-        test_label_file = 'tiny_imagenet_train_y.npy'
-        self.train = train  # training set or test set
+#     def __init__(self, root, train=True, transform=None):
+#         super(TinyImageNet, self).__init__(root)
+#         training_data_file = 'tiny_imagenet_train_x.npy'
+#         training_label_file = 'tiny_imagenet_train_y.npy'
+#         test_data_file = 'tiny_imagenet_train_x.npy'
+#         test_label_file = 'tiny_imagenet_train_y.npy'
+#         self.train = train  # training set or test set
 
-        if self.train:
-            self.data = np.load(training_data_file, allow_pickle=True)
-            self.targets = np.load(training_label_file, allow_pickle=True)
-        else:
-            self.data = np.load(test_data_file, allow_pickle=True)
-            self.targets = np.load(test_label_file, allow_pickle=True)
-        # self.data = [x.reshape(50,50) for x in self.data]
-        self.targets = [x for x in self.targets]
+#         if self.train:
+#             self.data = np.load(training_data_file, allow_pickle=True)
+#             self.targets = np.load(training_label_file, allow_pickle=True)
+#         else:
+#             self.data = np.load(test_data_file, allow_pickle=True)
+#             self.targets = np.load(test_label_file, allow_pickle=True)
+#         # self.data = [x.reshape(50,50) for x in self.data]
+#         self.targets = [x for x in self.targets]
 
-    def __getitem__(self, index):
-        img, target = self.data[index], int(self.targets[index])
-        return img, target
+#     def __getitem__(self, index):
+#         img, target = self.data[index], int(self.targets[index])
+#         return img, target
 
-    def __len__(self):
-        return len(self.data)
+#     def __len__(self):
+#         return len(self.data)
 
 def get_dataset(dataset_name, args):
     dataset_name = dataset_name.lower()
@@ -134,6 +135,13 @@ def get_dataset(dataset_name, args):
         ])
         train_dataset = datasets.MNIST(args.root, train=True, transform=transform, download=True)
         test_dataset = datasets.MNIST(args.root, train=False, transform=transform, download=True)
+    elif dataset_name ==  "cifar10":
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ])
+        train_dataset = datasets.CIFAR10(args.root, train=True, download=True, transform=transform)
+        test_dataset = datasets.CIFAR10(args.root, train=False, download=True, transform=transform)
     return train_dataset, test_dataset
 
 
@@ -146,6 +154,8 @@ def get_model(args, num_classes=10):
         return LeNet5().cuda("cuda:"+str(args.rank))
     elif model_name == "mlp":
         return MLP().cuda("cuda:"+str(args.rank))
+    elif model_name == "resnet":
+        return resnet18().cuda("cuda:"+str(args.rank))
     return None
 
 

@@ -87,7 +87,7 @@ class DSGD(Optimizer):
     """
 
     def __init__(self, params, model, update_period = 10, lr=required, momentum=0, dampening=0,
-                 weight_decay=0, nesterov=False, vrl=False, local=None):
+                 weight_decay=0, nesterov=False, vrl=False, ghc= False, local=None):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -102,11 +102,12 @@ class DSGD(Optimizer):
         super(DSGD, self).__init__(params, defaults)
         self.model = model
         self.vrl = vrl
+        self.ghc = ghc
         self.iter_cnt = 0
         if not local:
             update_period = 1
         self.update_period = update_period
-        print("vrl:{}".format(self.vrl))
+        print("vrl: {}, ghc: {}".format(self.vrl,self.ghc))
 
 
     def __setstate__(self, state):
@@ -173,6 +174,13 @@ class DSGD(Optimizer):
                 if weight_decay != 0:
                     d_p.add_(weight_decay, p.data)
                 param_state = self.state[p]
+                if self.vrl:
+                    if 'vrl_buff' not in param_state:
+                        param_state['vrl_buff'] = torch.zeros_like(d_p).detach()
+                    if self.ghc:
+                        d_p = d_p - (self.update_period)**-0.5*param_state['vrl_buff']
+                    else:
+                        d_p = d_p - param_state['vrl_buff']
                 if momentum != 0:
                     if 'momentum_buffer' not in param_state:
                         buf = param_state['momentum_buffer'] = torch.clone(d_p).detach()
@@ -183,10 +191,6 @@ class DSGD(Optimizer):
                         d_p = d_p.add(momentum, buf)
                     else:
                         d_p = buf
-                if self.vrl:
-                    if 'vrl_buff' not in param_state:
-                        param_state['vrl_buff'] = torch.zeros_like(d_p).detach()
-                    d_p = d_p - param_state['vrl_buff']
                 p.data.add_(-group['lr'], d_p)
         self.iter_cnt += 1
         if self.iter_cnt % self.update_period ==0:

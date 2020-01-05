@@ -8,11 +8,12 @@ import matplotlib
 import argparse
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import json
-opt_names = ["minisgd","localsgd", "vrlsgd"]
-opt_label = {"vrlsgd":"VRL-SGD","localsgd":"Local SGD","minisgd":"S-SGD"}
+opt_names = ["minisgd","localsgd", "vrlsgd","gsgd"]
+opt_label = {"vrlsgd":"VRL-SGD","localsgd":"Local SGD","minisgd":"S-SGD","gsgd":"ghc-sgd"}
 color_set = {"red":"#f4433c", "green":"#0aa858", "blue":"#2d85f0", "yellow":"#ffbc32"}
-opt_color = {"minisgd":color_set["green"],"vrlsgd":color_set["red"],"localsgd":color_set["yellow"]}
+opt_color = {"minisgd":color_set["green"],"vrlsgd":color_set["red"],"localsgd":color_set["yellow"],"gsgd":color_set["blue"]}
 def get_data(solver_names, path,  eps=1e-14, loss_log=True):
     file_list = os.listdir(path)
     result = dict()
@@ -73,6 +74,12 @@ def plot_sgd(path, plot_data, title, pos=2, save="result", re_alpha=0.7):
     x = arange(len_y)
     ax.plot(x, y,  color=opt_color[solver_name], 
             label=opt_label[solver_name], linestyle="-",alpha=re_alpha,linewidth=linewidth,marker = '>',markevery=3*markevery,markersize=markersize)
+    solver_name = "gsgd"
+    y = plot_data[solver_name][st:,pos]
+    len_y = len(y)
+    x = arange(len_y)
+    ax.plot(x, y,  color=opt_color[solver_name], 
+            label=opt_label[solver_name], linestyle="-",alpha=re_alpha,linewidth=linewidth,marker = '*',markevery=3*markevery,markersize=markersize)
     solver_name = "localsgd"
     y = plot_data[solver_name][st:,pos]
     len_y = len(y)
@@ -98,7 +105,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     path = args.path
     print("path:{}".format(path))
-    test_solver = ["vrlsgd","minisgd", "localsgd"]
+    test_solver = ["vrlsgd","minisgd", "localsgd","gsgd"]
     plot_data = get_data(test_solver, path, 1e-5, False)
     print("args.pos",args.pos)
     plot_sgd(path, plot_data, args.title, args.pos, args.save, args.alpha)

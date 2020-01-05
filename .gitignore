@@ -1,0 +1,6 @@
+data/
+figure/
+record/
+checkpoint/
+*.pyc
+*.ipynb

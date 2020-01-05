@@ -124,11 +124,13 @@ class Trainer(object):
         
     def get_filename(self, args):
         alg_name = "minisgd"
-        if args.period > 1 and args.vrl:
+        if args.period > 1 and args.vrl and args.ghc:
+            alg_name = "gsgd"
+        elif args.period > 1 and args.vrl:
             alg_name = "vrlsgd"
         elif args.period > 1:
             alg_name = "localsgd"
-        filename = "record/{}_{}_{}_local_{}_vrl_{}_eta_{}_b_{}_cluster_data_{}".format(alg_name, args.model, args.dataset, args.period, int(args.vrl) , args.lr, args.batch_size, args.cluster_data)
+        filename = "record/{}_{}_{}_local_{}_vrl_{}_eta_{}_mom_{}_b_{}_cluster_data_{}".format(alg_name, args.model, args.dataset, args.period, int(args.vrl) , args.lr,args.momentum, args.batch_size, args.cluster_data)
         return filename
 
     def warm_up(self, optimizer, lr_grow):
