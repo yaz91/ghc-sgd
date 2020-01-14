@@ -11,6 +11,11 @@ from torchvision.models import resnet18
 from torchvision.datasets import *
 from numpy import *
 from textCNN import *
+from utils import graph_reader, feature_reader, target_reader
+
+from layers import StackedGCN
+from clusteringMachineWrapper import clusteringMachineWrapper
+from clustering import ClusteringMachine
 
 class MLP(nn.Module):
     def __init__(self, input_size=2048, out_size=200):
@@ -115,7 +120,7 @@ class MLP(nn.Module):
 #     def __len__(self):
 #         return len(self.data)
 
-def get_dataset(dataset_name, args):
+def get_dataset(dataset_name, args,clueterMachine=None):
     dataset_name = dataset_name.lower()
     print("dataset_name",dataset_name)
     if dataset_name == "tiny_imagenet":
@@ -142,11 +147,14 @@ def get_dataset(dataset_name, args):
         ])
         train_dataset = datasets.CIFAR10(args.root, train=True, download=True, transform=transform)
         test_dataset = datasets.CIFAR10(args.root, train=False, download=True, transform=transform)
+    elif dataset_name == "graphdata":
+        graphDataset = clusteringMachineWrapper(args, clueterMachine)
+        return graphDataset
     return train_dataset, test_dataset
 
 
 
-def get_model(args, num_classes=10):
+def get_model(args, num_classes=10,gcnFeatureCnt=10,gcnClassCnt=10):
     model_name = args.model.lower()
     if model_name == "text_cnn":
         return CNN_Text(class_num=14).cuda("cuda:"+str(args.rank))
@@ -156,9 +164,9 @@ def get_model(args, num_classes=10):
         return MLP().cuda("cuda:"+str(args.rank))
     elif model_name == "resnet":
         return resnet18().cuda("cuda:"+str(args.rank))
+    elif model_name == "cgcn":
+        return StackedGCN(args,gcnFeatureCnt,gcnClassCnt).cuda("cuda:"+str(args.rank))
     return None
-
-
 
 _, term_width = os.popen('stty size', 'r').read().split()
 term_width = int(term_width)

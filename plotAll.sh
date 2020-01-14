@@ -1,0 +1,2 @@
+python plot.py --path record/cgcnMom/ --pos 0 --title "cgcn, anon" --save "cgcnMoM" --alpha 0.4
+python plot.py --path record/cgcnNoMom/ --title "cgcn no momentum, anon" --save "cgcnNoMoM" --pos 0 --alpha 0.4
