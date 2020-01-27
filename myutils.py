@@ -17,6 +17,7 @@ from layers import StackedGCN
 from clusteringMachineWrapper import clusteringMachineWrapper
 from clustering import ClusteringMachine
 
+
 class MLP(nn.Module):
     def __init__(self, input_size=2048, out_size=200):
         super(MLP, self).__init__()
